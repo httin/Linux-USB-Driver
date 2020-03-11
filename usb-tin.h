@@ -4,14 +4,21 @@
 #define USB_VENDOR_ID 0x1687
 #define USB_PRODUCT_ID 0x3257
 #define MAX_PKT_SIZE 512
-#define BULK_EP_IN 0x81
-#define BULK_EP_OUT 0x82
 
 /* private data for specific USB device */
 struct my_usb {
     struct usb_device *device; /* kernel's representation of a USB device */
     struct usb_interface *interface; /* what usb device drivers talk to */
+	struct urb		*bulk_in_urb;		/* the urb to read data with */
 
+	unsigned char	*bulk_in_buffer;	/* the buffer to receive data */
+	size_t			bulk_in_size;		/* the size of the receive buffer */
+	size_t			bulk_in_filled;		/* number of bytes in the buffer */
+	size_t			bulk_in_copied;		/* already copied to user space */
+	struct kref kref;	/* generic reference counted objects */
+
+	__u8 			bulk_in_endpointAddr;
+	__u8			bulk_out_endpointAddr;
 };
 
 unsigned char bulk_buf[MAX_PKT_SIZE];
